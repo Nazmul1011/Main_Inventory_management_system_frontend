@@ -29,35 +29,34 @@ export default function About() {
 
   const team = [
     {
-      name: "Nazmul Hasan",
-      role: "Founder & Lead Developer",
-      img: "https://randomuser.me/api/portraits/men/12.jpg",
+      name: "Mahabubur Rahman Shovo",
+      role: "",
+      img: "/src/assets/Mahabubur Rahman Shovo.jpeg",
     },
     {
-      name: "Arafat Rahman",
-      role: "UI/UX Designer",
-      img: "https://randomuser.me/api/portraits/men/23.jpg",
+      name: "Shakib Ali Khan",
+      role: "",
+      img: "/src/assets/Shakib Ali Khan.jpeg",
     },
     {
-      name: "Rafsan Jamil",
-      role: "Backend Engineer",
-      img: "https://randomuser.me/api/portraits/men/44.jpg",
+      name: "Ali Hayder",
+      role: "",
+      img: "/src/assets/Ali Hayder.jpeg",
     },
-   
   ];
 
   return (
-    <div className="bg-gray-50 text-gray-900">
+    <div className="bg-white text-gray-900 font-sans">
       {/* ================== Hero / About Section ================== */}
       <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center py-16 px-6">
         <img
-          src="src/assets/Inventoyr_contact.jpg"
+          src="/src/assets/Inventoyr_contact.jpg"
           alt="Inventory Management Team"
           className="rounded-xl shadow-lg object-cover w-full h-[400px]"
         />
 
         <div>
-          <h3 className="text-sm uppercase text-green-600 font-semibold mb-2">
+          <h3 className="text-sm uppercase text-indigo-600 font-semibold mb-2">
             Why Choose IMS
           </h3>
           <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
@@ -93,47 +92,40 @@ export default function About() {
       </section>
 
       {/* ================== Team Section ================== */}
-      <section className="bg-gray-50 py-20 text-center">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-6">
           {/* Header */}
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Meet the Team
-          </h2>
-          <p className="text-gray-600 mt-3 mb-12 max-w-2xl mx-auto">
-            The people behind our Inventory Management System — a passionate
-            team dedicated to innovation, performance, and user-centric design.
-          </p>
+          <div className="mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+              Meet the Team
+            </h2>
+            <p className="text-gray-500 text-lg max-w-2xl">
+              The people behind our Inventory Management System — a passionate
+              team dedicated to innovation and performance.
+            </p>
+          </div>
 
           {/* Team Members Grid */}
-          <div className="grid sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 gap-x-8 gap-y-16">
             {team.map((member, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center space-y-4 group"
-              >
-                {/* Profile Picture */}
-                <div className="relative">
+              <div key={index} className="flex flex-col">
+                {/* Name and Role Header */}
+                <div className="flex justify-between items-end mb-4 px-1">
+                  <h3 className="text-xl font-bold text-gray-900 leading-none">
+                    {member.name.split(" ")[0]}
+                  </h3>
+                  <span className="text-sm font-medium text-gray-900 uppercase tracking-wider leading-none">
+                    {member.role}
+                  </span>
+                </div>
+
+                {/* Team Image - Large card style */}
+                <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden group">
                   <img
                     src={member.img}
                     alt={member.name}
-                    className="w-36 h-36  rounded-full  object-cover shadow-lg transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
-                </div>
-
-                {/* Info */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {member.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{member.role}</p>
-                </div>
-
-                {/* Social Icons */}
-                <div className="flex justify-center gap-4 text-gray-400">
-                  <FiLinkedin className="hover:text-indigo-500 cursor-pointer transition" />
-                  <FiTwitter className="hover:text-sky-500 cursor-pointer transition" />
-                  <FiGithub className="hover:text-gray-700 cursor-pointer transition" />
                 </div>
               </div>
             ))}

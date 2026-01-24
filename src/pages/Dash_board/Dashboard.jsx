@@ -1,23 +1,36 @@
-// First Version 
-
-
+// First Version
 
 import { useEffect, useState } from "react";
-import { FiPackage, FiDollarSign, FiTruck, FiAlertTriangle } from "react-icons/fi";
+import {
+  FiPackage,
+  FiDollarSign,
+  FiTruck,
+  FiAlertTriangle,
+} from "react-icons/fi";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  CategoryScale, LinearScale, BarElement,
-  PointElement, LineElement, ArcElement,
-  Tooltip, Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend,
 } from "chart.js";
 import StatCard from "../../components/Statcard";
 import { getInventoryDashboard } from "../../services/dashboard";
 
 ChartJS.register(
-  CategoryScale, LinearScale, BarElement,
-  PointElement, LineElement, ArcElement,
-  Tooltip, Legend
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend,
 );
 
 export default function Dashboard() {
@@ -25,7 +38,8 @@ export default function Dashboard() {
   const [stats, setStats] = useState([]);
   const [stockValueData, setStockValueData] = useState(null);
   const [salesTrendData, setSalesTrendData] = useState(null);
-  const [categoryDistributionData, setCategoryDistributionData] = useState(null);
+  const [categoryDistributionData, setCategoryDistributionData] =
+    useState(null);
   const [topProducts, setTopProducts] = useState([]);
 
   useEffect(() => {
@@ -35,14 +49,36 @@ export default function Dashboard() {
         const { data } = await getInventoryDashboard();
         const summary = data?.summary ?? {};
         const charts = data?.charts ?? {};
-        const top = Array.isArray(data?.top_products_sold) ? data.top_products_sold : [];
+        const top = Array.isArray(data?.top_products_sold)
+          ? data.top_products_sold
+          : [];
 
         // ======== KPI cards ========
         setStats([
-          { title: "Total Products",       value: String(summary.total_products ?? 0),           change: "", icon: <FiPackage /> },
-          { title: "Total Stock Value",    value: formatCurrency(summary.total_stock_value_retail ?? 0), change: "", icon: <FiDollarSign /> },
-          { title: "Total Suppliers",      value: String(summary.total_suppliers ?? 0),          change: "", icon: <FiTruck /> },
-          { title: "Low-Stock Items",      value: String(summary.low_stock_items ?? 0),          change: "", icon: <FiAlertTriangle /> },
+          {
+            title: "Total Products",
+            value: String(summary.total_products ?? 0),
+            change: "",
+            icon: <FiPackage />,
+          },
+          {
+            title: "Total Stock Value",
+            value: formatCurrency(summary.total_stock_value_retail ?? 0),
+            change: "",
+            icon: <FiDollarSign />,
+          },
+          {
+            title: "Total Suppliers",
+            value: String(summary.total_suppliers ?? 0),
+            change: "",
+            icon: <FiTruck />,
+          },
+          {
+            title: "Low-Stock Items",
+            value: String(summary.low_stock_items ?? 0),
+            change: "",
+            icon: <FiAlertTriangle />,
+          },
         ]);
 
         // ======== Stock value by month (pad to last 6 months) ========
@@ -52,34 +88,62 @@ export default function Dashboard() {
         setSalesTrendData(buildSalesTrend(charts?.sales_trend_last_7_days));
 
         // ======== Category distribution (pad a few categories for nicer donut) ========
-        setCategoryDistributionData(buildCategoryDist(charts?.category_distribution));
+        setCategoryDistributionData(
+          buildCategoryDist(charts?.category_distribution),
+        );
 
         // ======== Top products (pad to 5 rows) ========
         setTopProducts(buildTopProducts(top));
       } catch (e) {
         setErr(
           e?.response?.data?.detail ||
-          e?.response?.data?.message ||
-          "Failed to load dashboard."
+            e?.response?.data?.message ||
+            "Failed to load dashboard.",
         );
         // keep UI usable with minimal safe dummies
-        setStats((s) => s.length ? s : [
-          { title: "Total Products", value: "0", change: "", icon: <FiPackage /> },
-          { title: "Total Stock Value", value: "$0", change: "", icon: <FiDollarSign /> },
-          { title: "Total Suppliers", value: "0", change: "", icon: <FiTruck /> },
-          { title: "Low-Stock Items", value: "0", change: "", icon: <FiAlertTriangle /> },
-        ]);
+        setStats((s) =>
+          s.length
+            ? s
+            : [
+                {
+                  title: "Total Products",
+                  value: "0",
+                  change: "",
+                  icon: <FiPackage />,
+                },
+                {
+                  title: "Total Stock Value",
+                  value: "$0",
+                  change: "",
+                  icon: <FiDollarSign />,
+                },
+                {
+                  title: "Total Suppliers",
+                  value: "0",
+                  change: "",
+                  icon: <FiTruck />,
+                },
+                {
+                  title: "Low-Stock Items",
+                  value: "0",
+                  change: "",
+                  icon: <FiAlertTriangle />,
+                },
+              ],
+        );
         setStockValueData((d) => d || buildStockByMonth([]));
         setSalesTrendData((d) => d || buildSalesTrend([]));
         setCategoryDistributionData((d) => d || buildCategoryDist([]));
-        setTopProducts((t) => t.length ? t : buildTopProducts([]));
+        setTopProducts((t) => (t.length ? t : buildTopProducts([])));
       }
     })();
   }, []);
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-semibold text-gray-900">Inventory Dashboard</h2>
+      <h2 className="text-2xl font-semibold text-gray-900">
+        Inventory Dashboard
+      </h2>
 
       {err && (
         <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
@@ -89,13 +153,17 @@ export default function Dashboard() {
 
       {/* KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => <StatCard key={s.title} {...s} />)}
+        {stats.map((s) => (
+          <StatCard key={s.title} {...s} />
+        ))}
       </div>
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-gray-700 font-medium mb-4">Stock Value by Month</h3>
+          <h3 className="text-gray-700 font-medium mb-4">
+            Stock Value by Month
+          </h3>
           {stockValueData && (
             <Bar
               data={stockValueData}
@@ -108,7 +176,9 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-gray-700 font-medium mb-4">Sales Trend (Last 7 Days)</h3>
+          <h3 className="text-gray-700 font-medium mb-4">
+            Sales Trend (Last 7 Days)
+          </h3>
           {salesTrendData && (
             <Line
               data={salesTrendData}
@@ -124,7 +194,9 @@ export default function Dashboard() {
       {/* Bottom */}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-gray-700 font-medium mb-4">Product Category Distribution</h3>
+          <h3 className="text-gray-700 font-medium mb-4">
+            Product Category Distribution
+          </h3>
           <div className="w-56 mx-auto">
             {categoryDistributionData && (
               <Doughnut
@@ -141,13 +213,20 @@ export default function Dashboard() {
           </div>
           <div className="space-y-4">
             {topProducts.map((p, idx) => (
-              <div key={`${p.name}-${idx}`} className="flex items-center justify-between border-b pb-3 last:border-none">
+              <div
+                key={`${p.name}-${idx}`}
+                className="flex items-center justify-between border-b pb-3 last:border-none"
+              >
                 <div>
                   <div className="font-medium text-gray-800">{p.name}</div>
                   <div className="text-xs text-gray-500">{p.category}</div>
                 </div>
-                <div className="text-sm text-gray-500 w-20 text-center">{p.quantity_sold} sold</div>
-                <div className="font-semibold text-gray-800">{formatCurrency(p.sales_value)}</div>
+                <div className="text-sm text-gray-500 w-20 text-center">
+                  {p.quantity_sold} sold
+                </div>
+                <div className="font-semibold text-gray-800">
+                  {formatCurrency(p.sales_value)}
+                </div>
               </div>
             ))}
           </div>
@@ -161,7 +240,11 @@ export default function Dashboard() {
 
 function formatCurrency(n) {
   const v = Number(n || 0);
-  return v.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  return v.toLocaleString(undefined, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
 }
 
 /** Build last 6 month labels like ["Jun","Jul","Aug","Sep","Oct","Nov"] */
@@ -184,25 +267,27 @@ function buildStockByMonth(api = []) {
     if (m?.month) map.set(m.month, Number(m.value || 0));
   });
 
-  // find a base to pad from
-  const presentVals = [...map.values()];
-  const base = presentVals.length ? presentVals[presentVals.length - 1] : 10000;
-
-  const data = labels.map((label, i) => {
-    if (map.has(label)) return map.get(label);
-    // gentle dummy ramp around base (so it looks natural)
-    const delta = (i - (labels.length - 1)) * 500; // -2500 .. 0
-    return Math.max(0, base + delta);
+  const data = labels.map((label) => {
+    return map.get(label) || 0;
   });
 
   return {
     labels,
-    datasets: [{
-      label: "Stock Value",
-      data,
-      backgroundColor: ["#5347CE", "#4896FE", "#16C8C7", "#887CFD", "#4896FE", "#5347CE"],
-      borderRadius: 6,
-    }],
+    datasets: [
+      {
+        label: "Stock Value",
+        data,
+        backgroundColor: [
+          "#5347CE",
+          "#4896FE",
+          "#16C8C7",
+          "#887CFD",
+          "#4896FE",
+          "#5347CE",
+        ],
+        borderRadius: 6,
+      },
+    ],
   };
 }
 
@@ -214,12 +299,8 @@ function buildSalesTrend(api = []) {
     if (d?.day) map.set(d.day, Number(d.sales || 0));
   });
 
-  // make small dummy variation
-  const baseline = 1000;
-  const values = days.map((iso, idx) => {
-    if (map.has(iso)) return map.get(iso);
-    const bump = (idx % 3) * 120; // 0,120,240 pattern
-    return baseline + bump;
+  const values = days.map((iso) => {
+    return map.get(iso) || 0;
   });
 
   const labels = days.map((iso) => {
@@ -229,14 +310,16 @@ function buildSalesTrend(api = []) {
 
   return {
     labels,
-    datasets: [{
-      label: "Sales (USD)",
-      data: values,
-      borderColor: "#4896FE",
-      backgroundColor: "#4896FE",
-      tension: 0.3,
-      fill: false,
-    }],
+    datasets: [
+      {
+        label: "Sales (USD)",
+        data: values,
+        borderColor: "#4896FE",
+        backgroundColor: "#4896FE",
+        tension: 0.3,
+        fill: false,
+      },
+    ],
   };
 }
 
@@ -254,43 +337,36 @@ function lastNDatesISO(n = 7) {
 /** Make a nicer donut even if API returns a single category. */
 function buildCategoryDist(api = []) {
   const base = Array.isArray(api) ? api : [];
-  // if only one category, add 2 tiny dummies so chart looks balanced
-  const padded = base.length >= 3 ? base : [
-    ...base,
-    { category: "Misc", count: 1 },
-    { category: "Other", count: 1 },
-  ].slice(0, Math.max(3, base.length));
 
   return {
-    labels: padded.map((c) => c.category ?? "—"),
-    datasets: [{
-      data: padded.map((c) => Number(c.count || 0)),
-      backgroundColor: ["#5347CE", "#4896FE", "#16C8C7", "#887CFD", "#A2D9CE"],
-      borderWidth: 0,
-    }],
+    labels: base.map((c) => c.category ?? "—"),
+    datasets: [
+      {
+        data: base.map((c) => Number(c.count || 0)),
+        backgroundColor: [
+          "#5347CE",
+          "#4896FE",
+          "#16C8C7",
+          "#887CFD",
+          "#A2D9CE",
+        ],
+        borderWidth: 0,
+      },
+    ],
   };
 }
 
 /** Ensure at least 5 rows for the table. */
 function buildTopProducts(api = []) {
-  const rows = (api || []).map((p) => ({
+  return (api || []).map((p) => ({
     name: p?.name ?? "—",
     category: p?.category ?? "—",
     quantity_sold: Number(p?.quantity_sold ?? 0),
     sales_value: Number(p?.sales_value ?? 0),
   }));
-  const dummies = [
-    { name: "Placeholder A", category: "General", quantity_sold: 3, sales_value: 120 },
-    { name: "Placeholder B", category: "General", quantity_sold: 2, sales_value: 90 },
-    { name: "Placeholder C", category: "General", quantity_sold: 1, sales_value: 45 },
-  ];
-  while (rows.length < 5) rows.push(dummies[rows.length % dummies.length]);
-  return rows.slice(0, 5);
 }
 
-
-
-// second version 
+// second version
 
 // import { useEffect, useState } from "react";
 // import { FiPackage, FiDollarSign, FiTruck, FiAlertTriangle } from "react-icons/fi";

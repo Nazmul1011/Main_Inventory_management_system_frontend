@@ -1,5 +1,6 @@
-import { HiArrowNarrowRight } from "react-icons/hi";
+import { Link as ScrollLink } from "react-scroll";
 import { Link } from "react-router-dom";
+import { HiArrowNarrowRight } from "react-icons/hi";
 
 export const HeroSection = () => {
   return (
@@ -35,9 +36,15 @@ export const HeroSection = () => {
               <HiArrowNarrowRight />
             </button>
 
-            <button className="btn btn-outline btn-primary text-white border-white hover:bg-white hover:text-black p-4">
+            <ScrollLink
+              to="Contactus-section"
+              smooth={true}
+              duration={600}
+              offset={-80}
+              className="btn btn-outline btn-primary text-white border-white hover:bg-white hover:text-black p-4 cursor-pointer flex items-center justify-center"
+            >
               Contact Us
-            </button>
+            </ScrollLink>
           </div>
         </div>
       </div>
