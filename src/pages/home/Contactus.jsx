@@ -96,10 +96,10 @@ export default function ContactUs() {
             <p className="text-gray-500 mt-2">
               Or just reach out manually at{" "}
               <a
-                href="mailto:nazmultec1011@gmail.com"
+                href="mailto:patwarysmah59@gmail.com"
                 className="text-indigo-600 font-medium hover:underline"
               >
-                nazmultec1011@gmail.com
+                patwarysmah59@gmail.com
               </a>
             </p>
           </div>

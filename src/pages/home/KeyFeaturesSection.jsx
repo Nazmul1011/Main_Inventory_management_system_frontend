@@ -28,7 +28,7 @@ export const KeyFeaturesSection = () => {
     <div className="max-w-screen-2xl container mx-auto bg-gray-100 px-20 py-20 text-center">
       <SectionHeader
         header="The Tools You Need"
-        subheader="All-in-One Solution for Your Projects"
+        subheader="All-in-One Solution for Your Business"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
