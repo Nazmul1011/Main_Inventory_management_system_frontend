@@ -113,7 +113,7 @@ export default function Dashboard() {
                 },
                 {
                   title: "Total Stock Value",
-                  value: "$0",
+                  value: "৳0",
                   change: "",
                   icon: <FiDollarSign />,
                 },
@@ -240,11 +240,12 @@ export default function Dashboard() {
 
 function formatCurrency(n) {
   const v = Number(n || 0);
-  return v.toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  return (
+    "৳" +
+    v.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })
+  );
 }
 
 /** Build last 6 month labels like ["Jun","Jul","Aug","Sep","Oct","Nov"] */
@@ -312,7 +313,7 @@ function buildSalesTrend(api = []) {
     labels,
     datasets: [
       {
-        label: "Sales (USD)",
+        label: "Sales (৳)",
         data: values,
         borderColor: "#4896FE",
         backgroundColor: "#4896FE",

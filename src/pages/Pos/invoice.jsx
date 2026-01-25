@@ -5,12 +5,14 @@ import { getSale } from "../../services/pos";
 import { listProducts } from "../../services/product";
 import { FiPrinter, FiDownload } from "react-icons/fi";
 
-const Money = ({ value }) => <span>${Number(value || 0).toFixed(2)}</span>;
+const Money = ({ value }) => <span>৳{Number(value || 0).toFixed(2)}</span>;
 
 // Parse "Customer: X | Mobile: Y | other notes..." into {name, phone}
 function parseCustomerFromNotes(notes = "") {
   const res = { name: "Walk-in Customer", phone: "—" };
-  const parts = String(notes).split("|").map(s => s.trim());
+  const parts = String(notes)
+    .split("|")
+    .map((s) => s.trim());
   for (const p of parts) {
     const [k, ...rest] = p.split(":");
     if (!k || !rest.length) continue;
@@ -23,8 +25,8 @@ function parseCustomerFromNotes(notes = "") {
 }
 
 export default function InvoicePage() {
-  const { id } = useParams();          // /dashboard/invoice/:id
-  const { state } = useLocation();     // optional preview state (not used here)
+  const { id } = useParams(); // /dashboard/invoice/:id
+  const { state } = useLocation(); // optional preview state (not used here)
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
   const [sale, setSale] = useState(null);
@@ -44,7 +46,9 @@ export default function InvoicePage() {
         // ignore; we'll fallback to UUID if we can't fetch names
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Fetch the sale
@@ -57,13 +61,15 @@ export default function InvoicePage() {
         const { data } = await getSale(id);
         if (!mounted) return;
         setSale(data);
-      } catch (e) {
+      } catch {
         if (mounted) setErr("Failed to load invoice.");
       } finally {
         if (mounted) setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
   // Build a presentational model
@@ -77,14 +83,20 @@ export default function InvoicePage() {
       name: productMap[it.product] || it.product,
       price: Number(it.unit_price || 0),
       qty: Number(it.quantity || 0),
-      subtotal: Number(it.subtotal || (Number(it.unit_price || 0) * Number(it.quantity || 0))),
+      subtotal: Number(
+        it.subtotal || Number(it.unit_price || 0) * Number(it.quantity || 0),
+      ),
     }));
 
     // Back-end already gives totals; still compute a safe fallback
-    const subTotal = Number(sale.total_amount ?? items.reduce((s, i) => s + i.subtotal, 0));
+    const subTotal = Number(
+      sale.total_amount ?? items.reduce((s, i) => s + i.subtotal, 0),
+    );
     const discount = Number(sale.discount || 0);
     const vat = Number(sale.vat || 0);
-    const grand = Number(sale.net_total ?? Math.max(0, subTotal - discount + vat));
+    const grand = Number(
+      sale.net_total ?? Math.max(0, subTotal - discount + vat),
+    );
 
     return {
       number: sale.invoice_number || id,
@@ -102,8 +114,12 @@ export default function InvoicePage() {
   const handlePrint = () => window.print();
   const handleDownload = () => alert("Download PDF (coming soon)");
 
-  if (loading) return <div className="rounded bg-white p-4 shadow">Loading…</div>;
-  if (err) return <div className="rounded bg-white p-4 shadow text-rose-700">{err}</div>;
+  if (loading)
+    return <div className="rounded bg-white p-4 shadow">Loading…</div>;
+  if (err)
+    return (
+      <div className="rounded bg-white p-4 shadow text-rose-700">{err}</div>
+    );
   if (!view) return null;
 
   return (
@@ -134,8 +150,12 @@ export default function InvoicePage() {
         {/* Customer */}
         <div className="mt-4 rounded-lg bg-gray-50 p-4 border">
           <div className="text-sm">
-            <div><b>Customer:</b> {view.customer.name}</div>
-            <div><b>Mobile:</b> {view.customer.phone}</div>
+            <div>
+              <b>Customer:</b> {view.customer.name}
+            </div>
+            <div>
+              <b>Mobile:</b> {view.customer.phone}
+            </div>
           </div>
         </div>
 
@@ -154,7 +174,9 @@ export default function InvoicePage() {
               {view.items.map((it) => (
                 <tr key={it.id}>
                   <td className="px-4 py-2 text-gray-900">{it.name}</td>
-                  <td className="px-4 py-2 text-gray-700"><Money value={it.price} /></td>
+                  <td className="px-4 py-2 text-gray-700">
+                    <Money value={it.price} />
+                  </td>
                   <td className="px-4 py-2 text-gray-700">{it.qty}</td>
                   <td className="px-4 py-2 text-gray-900 font-medium">
                     <Money value={it.subtotal} />
@@ -162,7 +184,14 @@ export default function InvoicePage() {
                 </tr>
               ))}
               {view.items.length === 0 && (
-                <tr><td className="px-4 py-6 text-center text-gray-500" colSpan={4}>No items found.</td></tr>
+                <tr>
+                  <td
+                    className="px-4 py-6 text-center text-gray-500"
+                    colSpan={4}
+                  >
+                    No items found.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -172,19 +201,27 @@ export default function InvoicePage() {
         <div className="mt-6 rounded-lg bg-gray-50 border p-4">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span><Money value={view.subTotal} /></span>
+            <span>
+              <Money value={view.subTotal} />
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Discount</span>
-            <span>-<Money value={view.discount} /></span>
+            <span>
+              -<Money value={view.discount} />
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span>VAT</span>
-            <span><Money value={view.vat} /></span>
+            <span>
+              <Money value={view.vat} />
+            </span>
           </div>
           <div className="mt-2 border-t pt-2 flex justify-between font-semibold text-gray-900">
             <span>Grand Total</span>
-            <span><Money value={view.grand} /></span>
+            <span>
+              <Money value={view.grand} />
+            </span>
           </div>
         </div>
 

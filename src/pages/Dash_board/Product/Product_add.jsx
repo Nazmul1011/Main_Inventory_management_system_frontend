@@ -11,26 +11,31 @@ import {
 // Static unit options (match backend enum)
 const UNIT_OPTS = ["kg", "litre", "loaf", "gram", "piece", "box", "set"];
 // Backend status enums (snake_case)
-const STATUS_OPTS = ["in_stock", "low_stock", "out_of_stock", "active", "inactive", "archived"];
+const STATUS_OPTS = [
+  "in_stock",
+  "low_stock",
+  "out_of_stock",
+  "active",
+  "inactive",
+  "archived",
+];
 
 export default function ProductAdd() {
   const navigate = useNavigate();
 
   const [categories, setCategories] = useState([]); // [{id,name,description,...}]
   const [form, setForm] = useState({
-    productId: "",     // ← backend: product_id
+    productId: "", // ← backend: product_id
     name: "",
-    sku: "",
-    category: "",      // UUID
+    category: "", // UUID
     unit: "",
     purchasePrice: "",
     sellPrice: "",
-    reorder: "",
     stock: "",
     barcode: "",
-    status: "",        // empty → we’ll show auto helper; backend still accepts snake_case
+    status: "", // empty → we’ll show auto helper; backend still accepts snake_case
     description: "",
-    supplier: "",      // optional UUID (keep for later)
+    supplier: "", // optional UUID (keep for later)
   });
 
   const [loading, setLoading] = useState(false);
@@ -49,7 +54,7 @@ export default function ProductAdd() {
         if (!form.category && arr.length) {
           setForm((s) => ({ ...s, category: arr[0].id }));
         }
-      } catch (_) {
+      } catch {
         // keep empty; user can’t submit without category
       }
     })();
@@ -83,7 +88,8 @@ export default function ProductAdd() {
       if (data && typeof data === "object") {
         const fe = {};
         for (const [k, v] of Object.entries(data)) {
-          if (Array.isArray(v) && v.length && typeof v[0] === "string") fe[k] = v[0];
+          if (Array.isArray(v) && v.length && typeof v[0] === "string")
+            fe[k] = v[0];
         }
         setFieldErrors(fe);
       }
@@ -104,10 +110,15 @@ export default function ProductAdd() {
         <div className="p-3 rounded-xl bg-indigo-100 text-indigo-600">
           <FiBox size={22} />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-800">Add New Product</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Add New Product
+        </h2>
       </div>
 
-      <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <form
+        onSubmit={onSubmit}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+      >
         {/* Left Side */}
         <div className="grid gap-5">
           {/* Product ID + Name */}
@@ -132,17 +143,8 @@ export default function ProductAdd() {
             />
           </div>
 
-          {/* SKU + Barcode */}
-          <div className="grid grid-cols-2 gap-4">
-            <InputField
-              label="SKU"
-              name="sku"
-              value={form.sku}
-              onChange={onChange}
-              placeholder="sku"
-              required
-              error={fieldErrors.sku}
-            />
+          {/* Barcode only (SKU removed) */}
+          <div className="grid gap-4">
             <InputField
               label="Barcode"
               name="barcode"
@@ -200,17 +202,8 @@ export default function ProductAdd() {
             />
           </div>
 
-          {/* Reorder + Stock */}
-          <div className="grid grid-cols-2 gap-4">
-            <InputField
-              type="number"
-              label="Reorder Level"
-              name="reorder"
-              value={form.reorder}
-              onChange={onChange}
-              required
-              error={fieldErrors.reorder_level}
-            />
+          {/* Current Stock (Reorder removed) */}
+          <div className="grid gap-4">
             <InputField
               type="number"
               label="Current Stock"
@@ -235,7 +228,9 @@ export default function ProductAdd() {
 
           {/* Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">Description</label>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">
+              Description
+            </label>
             <textarea
               name="description"
               value={form.description}
@@ -244,7 +239,9 @@ export default function ProductAdd() {
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none transition"
             />
             {fieldErrors.description && (
-              <p className="mt-1 text-xs text-rose-600">{fieldErrors.description}</p>
+              <p className="mt-1 text-xs text-rose-600">
+                {fieldErrors.description}
+              </p>
             )}
           </div>
 
@@ -270,7 +267,7 @@ export default function ProductAdd() {
           <h3 className="font-semibold text-lg mb-2">Product Guidelines</h3>
           <ul className="text-sm list-disc list-inside space-y-1 text-gray-500">
             <li>Fill all mandatory fields</li>
-            <li>SKU should be unique</li>
+            <li>Fill all mandatory fields</li>
             <li>Use valid barcode format</li>
             <li>Status can be left empty to auto-derive</li>
           </ul>
@@ -284,7 +281,9 @@ export default function ProductAdd() {
 function InputField({ label, error, ...props }) {
   return (
     <div>
-      <label className="text-sm font-medium text-gray-700 mb-1 block">{label}</label>
+      <label className="text-sm font-medium text-gray-700 mb-1 block">
+        {label}
+      </label>
       <input
         {...props}
         className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none transition ${
@@ -296,10 +295,21 @@ function InputField({ label, error, ...props }) {
   );
 }
 
-function SelectField({ label, name, value, onChange, options, error, helper, required }) {
+function SelectField({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  error,
+  helper,
+  required,
+}) {
   return (
     <div>
-      <label className="text-sm font-medium text-gray-700 mb-1 block">{label}</label>
+      <label className="text-sm font-medium text-gray-700 mb-1 block">
+        {label}
+      </label>
       <select
         name={name}
         value={value}
@@ -312,10 +322,14 @@ function SelectField({ label, name, value, onChange, options, error, helper, req
         <option value="">{`Select ${label}`}</option>
         {options.map((o) =>
           typeof o === "string" ? (
-            <option key={o} value={o}>{o}</option>
+            <option key={o} value={o}>
+              {o}
+            </option>
           ) : (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          )
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ),
         )}
       </select>
       {helper && <p className="mt-1 text-xs text-gray-500">{helper}</p>}
