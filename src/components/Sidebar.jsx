@@ -1,15 +1,30 @@
 // src/pages/Dash_board/Sidebar.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  FiFile, FiHome, FiBox, FiUsers, FiTruck, FiBarChart2,
-  FiSettings, FiUser, FiFileText, FiShoppingCart, FiTrendingUp,
-  FiLogOut, FiTag, FiList, FiEdit
+  FiFile,
+  FiHome,
+  FiBox,
+  FiUsers,
+  FiTruck,
+  FiBarChart2,
+  FiUser,
+  FiFileText,
+  FiShoppingCart,
+  FiTrendingUp,
+  FiLogOut,
+  FiTag,
+  FiList,
+  FiEdit,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { logout } from "../services/auth";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
   const nav = useNavigate();
+
+  // Get user role from local storage (matching login logic)
+  const authData = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = authData?.role || "operator";
 
   const handleLogout = async () => {
     try {
@@ -33,7 +48,9 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* ===== Logo & Collapse Button ===== */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
         {!collapsed && (
-          <h1 className="text-lg font-semibold text-white truncate">IMS Admin</h1>
+          <h1 className="text-lg font-semibold text-white truncate">
+            IMS Admin
+          </h1>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -47,65 +64,150 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* ===== Navigation ===== */}
       <nav className="flex-1 mt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
         {!collapsed && <div className={sectionTitle}>Dashboard</div>}
-        <NavLink to="/dashboard" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
           <FiHome className="text-xl" /> {!collapsed && <span>Overview</span>}
         </NavLink>
 
         {!collapsed && <div className={sectionTitle}>Inventory</div>}
-        <NavLink to="/dashboard/product" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
+        <NavLink
+          to="/dashboard/product"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
           <FiBox className="text-xl" /> {!collapsed && <span>Products</span>}
         </NavLink>
-        <NavLink to="/dashboard/productlist" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiFileText className="text-xl" /> {!collapsed && <span>Product List</span>}
+        <NavLink
+          to="/dashboard/productlist"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
+          <FiFileText className="text-xl" />{" "}
+          {!collapsed && <span>Product List</span>}
         </NavLink>
-        <NavLink to="/dashboard/categories" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
+        <NavLink
+          to="/dashboard/categories"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
           <FiTag className="text-xl" /> {!collapsed && <span>Categories</span>}
         </NavLink>
 
         {!collapsed && <div className={sectionTitle}>Sales</div>}
-        <NavLink to="/dashboard/pos" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiShoppingCart className="text-xl" /> {!collapsed && <span>POS System</span>}
+        <NavLink
+          to="/dashboard/pos"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
+          <FiShoppingCart className="text-xl" />{" "}
+          {!collapsed && <span>POS System</span>}
         </NavLink>
-        <NavLink to="/dashboard/invoices" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiList className="text-xl" /> {!collapsed && <span>Invoice List</span>}
+        <NavLink
+          to="/dashboard/invoices"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
+          <FiList className="text-xl" />{" "}
+          {!collapsed && <span>Invoice List</span>}
         </NavLink>
 
         {!collapsed && <div className={sectionTitle}>Customers</div>}
-        <NavLink to="/dashboard/customeradd" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiUser className="text-xl" /> {!collapsed && <span>Add Customer</span>}
+        <NavLink
+          to="/dashboard/customeradd"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
+          <FiUser className="text-xl" />{" "}
+          {!collapsed && <span>Add Customer</span>}
         </NavLink>
-        <NavLink to="/dashboard/customerlist" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiUsers className="text-xl" /> {!collapsed && <span>Customer List</span>}
+        <NavLink
+          to="/dashboard/customerlist"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
+          <FiUsers className="text-xl" />{" "}
+          {!collapsed && <span>Customer List</span>}
         </NavLink>
 
-        {!collapsed && <div className={sectionTitle}>Suppliers</div>}
-        <NavLink to="/dashboard/supplier" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiTruck className="text-xl" /> {!collapsed && <span>Add Supplier</span>}
-        </NavLink>
-        <NavLink to="/dashboard/supplierlist" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiTruck className="text-xl" /> {!collapsed && <span>Supplier List</span>}
-        </NavLink>
+        {role !== "operator" && (
+          <>
+            {!collapsed && <div className={sectionTitle}>Suppliers</div>}
+            <NavLink
+              to="/dashboard/supplier"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : ""}`
+              }
+            >
+              <FiTruck className="text-xl" />{" "}
+              {!collapsed && <span>Add Supplier</span>}
+            </NavLink>
+            <NavLink
+              to="/dashboard/supplierlist"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : ""}`
+              }
+            >
+              <FiTruck className="text-xl" />{" "}
+              {!collapsed && <span>Supplier List</span>}
+            </NavLink>
+          </>
+        )}
 
-        {!collapsed && <div className={sectionTitle}>Reports</div>}
-        <NavLink to="/dashboard/salesreport" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiTrendingUp className="text-xl" /> {!collapsed && <span>Sales Report</span>}
-        </NavLink>
-        <NavLink to="/dashboard/stockreport" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiBarChart2 className="text-xl" /> {!collapsed && <span>Stock Report</span>}
-        </NavLink>
+        {role !== "operator" && (
+          <>
+            {!collapsed && <div className={sectionTitle}>Reports</div>}
+            <NavLink
+              to="/dashboard/salesreport"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : ""}`
+              }
+            >
+              <FiTrendingUp className="text-xl" />{" "}
+              {!collapsed && <span>Sales Report</span>}
+            </NavLink>
+            <NavLink
+              to="/dashboard/stockreport"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : ""}`
+              }
+            >
+              <FiBarChart2 className="text-xl" />{" "}
+              {!collapsed && <span>Stock Report</span>}
+            </NavLink>
+          </>
+        )}
 
         {/* ===== Account / Profile ===== */}
         {!collapsed && <div className={sectionTitle}>Account</div>}
-        <NavLink to="/dashboard/profile" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
+        <NavLink
+          to="/dashboard/profile"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
           <FiUser className="text-xl" /> {!collapsed && <span>Profile</span>}
         </NavLink>
 
         {!collapsed && <div className={sectionTitle}>Management</div>}
-        <NavLink to="/dashboard/usermanagement" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiUser className="text-xl" /> {!collapsed && <span>User Management</span>}
-        </NavLink>
-        <NavLink to="/dashboard/settings" className={({isActive}) => `${linkBase} ${isActive ? linkActive : ""}`}>
-          <FiSettings className="text-xl" /> {!collapsed && <span>Settings</span>}
+        <NavLink
+          to="/dashboard/usermanagement"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : ""}`
+          }
+        >
+          <FiUser className="text-xl" />{" "}
+          {!collapsed && <span>User Management</span>}
         </NavLink>
       </nav>
 

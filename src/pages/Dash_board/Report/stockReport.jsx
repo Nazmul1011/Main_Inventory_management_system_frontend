@@ -16,7 +16,9 @@ function StatusBadge({ stock, reorder }) {
     cls = "bg-amber-50 text-amber-700";
   }
   return (
-    <span className={`inline-flex items-center rounded px-2 py-1 text-xs font-medium ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded px-2 py-1 text-xs font-medium ${cls}`}
+    >
       {label}
     </span>
   );
@@ -40,8 +42,11 @@ export default function StockReport() {
 
   // categories from data
   const categories = useMemo(
-    () => ["All", ...Array.from(new Set(rows.map((r) => r.category).filter(Boolean)))],
-    [rows]
+    () => [
+      "All",
+      ...Array.from(new Set(rows.map((r) => r.category).filter(Boolean))),
+    ],
+    [rows],
   );
 
   // fetch from API (runs on mount and when q changes)
@@ -59,7 +64,7 @@ export default function StockReport() {
         const products = Array.isArray(data?.products) ? data.products : [];
         setRows(products.map(mapStockProduct));
         setSummary(mapStockSummary(data?.summary));
-      } catch (e) {
+      } catch {
         if (active) setErr("Failed to load stock report.");
       } finally {
         if (active) setLoading(false);
@@ -90,7 +95,9 @@ export default function StockReport() {
     }
     const cost = filtered.reduce((s, r) => s + r.stockValueCost, 0);
     const retail = filtered.reduce((s, r) => s + r.stockValueRetail, 0);
-    const low = filtered.filter((r) => r.stock > 0 && r.stock <= r.reorder).length;
+    const low = filtered.filter(
+      (r) => r.stock > 0 && r.stock <= r.reorder,
+    ).length;
     const oos = filtered.filter((r) => r.stock <= 0).length;
     return { cost, retail, low, oos };
   }, [summary, filtered, category]);
@@ -142,11 +149,13 @@ export default function StockReport() {
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded bg-white p-4 shadow">
           <div className="text-sm text-gray-500">Stock Value (Cost)</div>
-          <div className="text-xl font-bold">${viewTotals.cost.toFixed(2)}</div>
+          <div className="text-xl font-bold">৳{viewTotals.cost.toFixed(2)}</div>
         </div>
         <div className="rounded bg-white p-4 shadow">
           <div className="text-sm text-gray-500">Stock Value (Retail)</div>
-          <div className="text-xl font-bold">${viewTotals.retail.toFixed(2)}</div>
+          <div className="text-xl font-bold">
+            ৳{viewTotals.retail.toFixed(2)}
+          </div>
         </div>
         <div className="rounded bg-white p-4 shadow">
           <div className="text-sm text-gray-500">Low Stock Items</div>
@@ -179,12 +188,18 @@ export default function StockReport() {
             {filtered.map((r) => (
               <tr key={r.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-700">{r.id}</td>
-                <td className="px-4 py-3 text-gray-900 font-medium">{r.name}</td>
+                <td className="px-4 py-3 text-gray-900 font-medium">
+                  {r.name}
+                </td>
                 <td className="px-4 py-3 text-gray-700">{r.sku}</td>
                 <td className="px-4 py-3 text-gray-700">{r.category}</td>
                 <td className="px-4 py-3 text-gray-700">{r.unit}</td>
-                <td className="px-4 py-3 text-gray-700">${r.purchasePrice.toFixed(2)}</td>
-                <td className="px-4 py-3 text-gray-700">${r.sellPrice.toFixed(2)}</td>
+                <td className="px-4 py-3 text-gray-700">
+                  ৳{r.purchasePrice.toFixed(2)}
+                </td>
+                <td className="px-4 py-3 text-gray-700">
+                  ৳{r.sellPrice.toFixed(2)}
+                </td>
                 <td className="px-4 py-3 text-gray-700">{r.reorder}</td>
                 <td className="px-4 py-3 text-gray-700">{r.stock}</td>
                 <td className="px-4 py-3">
@@ -194,7 +209,10 @@ export default function StockReport() {
             ))}
             {filtered.length === 0 && !loading && (
               <tr>
-                <td className="px-4 py-6 text-center text-gray-500" colSpan={10}>
+                <td
+                  className="px-4 py-6 text-center text-gray-500"
+                  colSpan={10}
+                >
                   No data.
                 </td>
               </tr>

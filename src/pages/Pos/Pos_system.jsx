@@ -1,10 +1,14 @@
-/// Third version 
+/// Third version
 
 // src/pages/Pos/Pos_system.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listProducts as apiListProducts } from "../../services/product";
-import { createSale, buildSalePayload, mapProductToPOS } from "../../services/pos";
+import {
+  createSale,
+  buildSalePayload,
+  mapProductToPOS,
+} from "../../services/pos";
 
 export default function PointOfSale() {
   const navigate = useNavigate();
@@ -31,7 +35,9 @@ export default function PointOfSale() {
         if (mounted) setLoadingProducts(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const filteredProducts = useMemo(() => {
@@ -41,7 +47,7 @@ export default function PointOfSale() {
       (p) =>
         (p.name || "").toLowerCase().includes(q) ||
         String(p.price).includes(q) ||
-        String(p.id).includes(q)
+        String(p.id).includes(q),
     );
   }, [products, query]);
 
@@ -62,15 +68,31 @@ export default function PointOfSale() {
       const idx = c.findIndex((i) => i.id === product.id);
       if (idx > -1) {
         const next = [...c];
-        next[idx] = { ...next[idx], qty: next[idx].qty + 1 };
+        const newQty = next[idx].qty + 1;
+        if (newQty > product.stock) {
+          setPayErr(
+            `Cannot add more than ${product.stock} units for ${product.name}.`,
+          );
+          return c;
+        }
+        next[idx] = { ...next[idx], qty: newQty };
         return next;
+      }
+      if (product.stock <= 0) {
+        setPayErr(`${product.name} is out of stock.`);
+        return c;
       }
       return [...c, { ...product, qty: 1 }];
     });
   };
-  const updateQty = (id, qty) => {
-    const q = Math.max(1, Number(qty) || 1);
-    setCart((c) => c.map((i) => (i.id === id ? { ...i, qty: q } : i)));
+  const updateQty = (id, qty, stockLimit, name) => {
+    let q = Number(qty) || 1;
+    if (q > stockLimit) {
+      setPayErr(`Only ${stockLimit} units available for ${name}.`);
+      q = stockLimit;
+    }
+    const finalQ = Math.max(1, q);
+    setCart((c) => c.map((i) => (i.id === id ? { ...i, qty: finalQ } : i)));
   };
   const removeLine = (id) => setCart((c) => c.filter((i) => i.id !== id));
 
@@ -92,8 +114,14 @@ export default function PointOfSale() {
   const onPay = async () => {
     setPayErr(null);
     if (cart.length === 0) return;
-    if (!customerName.trim()) { setPayErr("Please enter customer name."); return; }
-    if (!customerPhone.trim()) { setPayErr("Please enter mobile number."); return; }
+    if (!customerName.trim()) {
+      setPayErr("Please enter customer name.");
+      return;
+    }
+    if (!customerPhone.trim()) {
+      setPayErr("Please enter mobile number.");
+      return;
+    }
 
     setPaying(true);
     try {
@@ -122,33 +150,45 @@ export default function PointOfSale() {
         customer: { name: customerName, phone: customerPhone },
         items: (data?.items || cart).map((it, idx) => ({
           id: idx + 1,
-          name: it.name ?? it.product,              // backend may return product UUID
+          name: it.name ?? it.product, // backend may return product UUID
           price: Number(it.unit_price ?? it.price),
           qty: Number(it.quantity ?? it.qty ?? 1),
         })),
         discount: Number(data?.discount ?? discount ?? 0),
         vat: Number(data?.vat ?? vatAmount ?? 0),
         totals: {
-          subTotal:
-            Number(data?.total_amount ??
-              cart.reduce((s, i) => s + i.price * i.qty, 0)),
-          grand:
-            Number(data?.net_total ??
-              Math.max(0, cart.reduce((s, i) => s + i.price * i.qty, 0) - Number(discount || 0) + Number(vatAmount || 0))),
+          subTotal: Number(
+            data?.total_amount ?? cart.reduce((s, i) => s + i.price * i.qty, 0),
+          ),
+          grand: Number(
+            data?.net_total ??
+              Math.max(
+                0,
+                cart.reduce((s, i) => s + i.price * i.qty, 0) -
+                  Number(discount || 0) +
+                  Number(vatAmount || 0),
+              ),
+          ),
         },
         note: data?.notes ?? notes ?? "",
       };
 
       if (saleId) {
-        navigate(`/dashboard/invoice/${saleId}`, { replace: true, state: invoiceState });
+        navigate(`/dashboard/invoice/${saleId}`, {
+          replace: true,
+          state: invoiceState,
+        });
       } else {
-        navigate(`/dashboard/invoice/preview`,    { replace: true, state: invoiceState });
+        navigate(`/dashboard/invoice/preview`, {
+          replace: true,
+          state: invoiceState,
+        });
       }
     } catch (e) {
       setPayErr(
         e?.response?.data?.detail ||
-        e?.response?.data?.message ||
-        "Payment failed."
+          e?.response?.data?.message ||
+          "Payment failed.",
       );
     } finally {
       setPaying(false);
@@ -171,8 +211,17 @@ export default function PointOfSale() {
                 placeholder="Search products…"
                 className="w-full rounded-md border border-gray-200 bg-gray-100 pl-9 pr-3 py-2 text-sm outline-none placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
               />
-              <svg className="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none">
-                <path d="M21 21l-4.3-4.3M10 18a8 8 0 100-16 8 8 0 000 16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <svg
+                className="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-gray-400"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M21 21l-4.3-4.3M10 18a8 8 0 100-16 8 8 0 000 16z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
           </div>
@@ -188,27 +237,42 @@ export default function PointOfSale() {
               <thead className="sticky top-0 bg-gray-50">
                 <tr>
                   <th className="px-4 py-2 font-medium text-gray-600">Name</th>
+                  <th className="px-4 py-2 font-medium text-gray-600">Stock</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Price</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {loadingProducts ? (
-                  <tr><td className="px-4 py-6 text-gray-500" colSpan={2}>Loading…</td></tr>
+                  <tr>
+                    <td className="px-4 py-6 text-gray-500" colSpan={2}>
+                      Loading…
+                    </td>
+                  </tr>
                 ) : filteredProducts.length ? (
                   filteredProducts.map((p) => (
                     <tr
                       key={p.id}
-                      className="cursor-pointer hover:bg-gray-50"
+                      className={`cursor-pointer hover:bg-gray-50 ${p.stock <= 0 ? "opacity-50 pointer-events-none" : ""}`}
                       onClick={() => addToCart(p)}
-                      title="Click to add to cart"
+                      title={
+                        p.stock <= 0 ? "Out of stock" : "Click to add to cart"
+                      }
                     >
-                      <td className="px-4 py-2 text-gray-900 font-medium">{p.name}</td>
-                      <td className="px-4 py-2 text-gray-700">${p.price.toFixed(2)}</td>
+                      <td className="px-4 py-2 text-gray-900 font-medium">
+                        {p.name}
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">{p.stock}</td>
+                      <td className="px-4 py-2 text-gray-700">
+                        ৳{p.price.toFixed(2)}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td className="px-4 py-6 text-center text-gray-500" colSpan={2}>
+                    <td
+                      className="px-4 py-6 text-center text-gray-500"
+                      colSpan={2}
+                    >
                       No products found.
                     </td>
                   </tr>
@@ -223,7 +287,9 @@ export default function PointOfSale() {
           {/* Customer */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Customer Name</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Customer Name
+              </label>
               <input
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
@@ -232,7 +298,9 @@ export default function PointOfSale() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Mobile Number</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Mobile Number
+              </label>
               <input
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
@@ -247,10 +315,14 @@ export default function PointOfSale() {
             <table className="min-w-full text-left text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-2 font-medium text-gray-600">Product</th>
+                  <th className="px-3 py-2 font-medium text-gray-600">
+                    Product
+                  </th>
                   <th className="px-3 py-2 font-medium text-gray-600">Price</th>
                   <th className="px-3 py-2 font-medium text-gray-600">Qty</th>
-                  <th className="px-3 py-2 font-medium text-gray-600">Line Total</th>
+                  <th className="px-3 py-2 font-medium text-gray-600">
+                    Line Total
+                  </th>
                   <th className="px-3 py-2"></th>
                 </tr>
               </thead>
@@ -258,18 +330,28 @@ export default function PointOfSale() {
                 {cart.map((line) => (
                   <tr key={line.id}>
                     <td className="px-3 py-2 text-gray-900">{line.name}</td>
-                    <td className="px-3 py-2 text-gray-700">${line.price.toFixed(2)}</td>
+                    <td className="px-3 py-2 text-gray-700">
+                      ৳{line.price.toFixed(2)}
+                    </td>
                     <td className="px-3 py-2">
                       <input
                         type="number"
                         min="1"
+                        max={line.stock}
                         value={line.qty}
-                        onChange={(e) => updateQty(line.id, e.target.value)}
+                        onChange={(e) =>
+                          updateQty(
+                            line.id,
+                            e.target.value,
+                            line.stock,
+                            line.name,
+                          )
+                        }
                         className="w-16 rounded border border-gray-300 px-2 py-1 text-sm"
                       />
                     </td>
                     <td className="px-3 py-2 text-gray-900">
-                      ${(line.qty * line.price).toFixed(2)}
+                      ৳{(line.qty * line.price).toFixed(2)}
                     </td>
                     <td className="px-3 py-2 text-right">
                       <button
@@ -283,7 +365,10 @@ export default function PointOfSale() {
                 ))}
                 {cart.length === 0 && (
                   <tr>
-                    <td className="px-3 py-6 text-center text-gray-500" colSpan={5}>
+                    <td
+                      className="px-3 py-6 text-center text-gray-500"
+                      colSpan={5}
+                    >
                       No items in cart. Click a product on the left to add.
                     </td>
                   </tr>
@@ -295,25 +380,35 @@ export default function PointOfSale() {
           {/* Discount, VAT, Status */}
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Discount ($)</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Discount (৳)
+              </label>
               <input
-                type="number" min="0" step="0.01"
+                type="number"
+                min="0"
+                step="0.01"
                 value={discount}
                 onChange={(e) => setDiscount(e.target.value)}
                 className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">VAT ($)</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                VAT (৳)
+              </label>
               <input
-                type="number" min="0" step="0.01"
+                type="number"
+                min="0"
+                step="0.01"
                 value={vatAmount}
                 onChange={(e) => setVatAmount(e.target.value)}
                 className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Payment Status</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Payment Status
+              </label>
               <select
                 value={paymentStatus}
                 onChange={(e) => setPaymentStatus(e.target.value)}
@@ -328,7 +423,9 @@ export default function PointOfSale() {
 
           {/* Notes */}
           <div className="mt-3">
-            <label className="mb-1 block text-sm font-medium text-gray-700">Notes</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Notes
+            </label>
             <textarea
               rows={2}
               value={notes}
@@ -340,10 +437,22 @@ export default function PointOfSale() {
 
           {/* Summary */}
           <div className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span>Subtotal</span><span>${subTotal.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>Discount</span><span>-${Number(discount || 0).toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>VAT</span><span>${vat.toFixed(2)}</span></div>
-            <div className="flex justify-between font-semibold text-gray-900"><span>Total</span><span>${total.toFixed(2)}</span></div>
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>৳{subTotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Discount</span>
+              <span>-৳{Number(discount || 0).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>VAT</span>
+              <span>৳{vat.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between font-semibold text-gray-900">
+              <span>Total</span>
+              <span>৳{total.toFixed(2)}</span>
+            </div>
           </div>
 
           {payErr && (
@@ -354,7 +463,10 @@ export default function PointOfSale() {
 
           {/* Actions */}
           <div className="mt-5 flex justify-end gap-3">
-            <button onClick={onClear} className="rounded border px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100">
+            <button
+              onClick={onClear}
+              className="rounded border px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+            >
               Clear
             </button>
             <button

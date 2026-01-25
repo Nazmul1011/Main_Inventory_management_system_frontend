@@ -23,12 +23,14 @@ export const mapProductToPOS = (api) => ({
   id: api.id,
   name: api.name,
   price: Number(api.sell_price ?? api.selling_price ?? 0),
+  stock: Number(api.current_stock || 0),
 });
 
 export const buildSalePayload = ({
   invoiceNumber, discount, vat, paidAmount, paymentStatus, notes, cart, customerName, customerPhone,
 }) => ({
   invoice_number: invoiceNumber,
+  customer_name: customerName,
   discount: Number(discount || 0),
   vat: Number(vat || 0),
   paid_amount: Number(paidAmount || 0),
