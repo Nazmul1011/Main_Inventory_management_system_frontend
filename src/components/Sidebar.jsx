@@ -199,16 +199,20 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           <FiUser className="text-xl" /> {!collapsed && <span>Profile</span>}
         </NavLink>
 
-        {!collapsed && <div className={sectionTitle}>Management</div>}
-        <NavLink
-          to="/dashboard/usermanagement"
-          className={({ isActive }) =>
-            `${linkBase} ${isActive ? linkActive : ""}`
-          }
-        >
-          <FiUser className="text-xl" />{" "}
-          {!collapsed && <span>User Management</span>}
-        </NavLink>
+        {role === "admin" && (
+          <>
+            {!collapsed && <div className={sectionTitle}>Management</div>}
+            <NavLink
+              to="/dashboard/usermanagement"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : ""}`
+              }
+            >
+              <FiUser className="text-xl" />{" "}
+              {!collapsed && <span>User Management</span>}
+            </NavLink>
+          </>
+        )}
       </nav>
 
       {/* ===== Footer (Logout) ===== */}

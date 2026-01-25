@@ -9,7 +9,10 @@ export const getTokens = () => {
   try { return JSON.parse(localStorage.getItem(TOKENS_KEY)) || null; } catch { return null; }
 };
 export const setTokens = (t) => localStorage.setItem(TOKENS_KEY, JSON.stringify(t));
-export const clearTokens = () => localStorage.removeItem(TOKENS_KEY);
+export const clearTokens = () => {
+  localStorage.removeItem(TOKENS_KEY);
+  localStorage.removeItem("user");
+};
 export const isLoggedIn = () => !!getTokens()?.access;
 
 // ---- axios instance for app requests ----

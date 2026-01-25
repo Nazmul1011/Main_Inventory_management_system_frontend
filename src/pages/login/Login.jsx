@@ -21,7 +21,10 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await login(form);            // sets tokens in localStorage
+      const data = await login(form); // sets tokens in localStorage
+      if (data?.user_info) {
+        localStorage.setItem("user", JSON.stringify(data.user_info));
+      }
       nav("/dashboard", { replace: true });
     } catch (err) {
       const msg =
@@ -47,7 +50,8 @@ export default function Login() {
         {/* Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
         <p className="text-gray-500 mb-6">
-          Log in to manage your inventory, track stock, and access your dashboard.
+          Log in to manage your inventory, track stock, and access your
+          dashboard.
         </p>
 
         {/* Error */}
@@ -115,25 +119,40 @@ export default function Login() {
 
           {/* Social Buttons (placeholders) */}
           <div className="flex justify-center gap-4">
-            <button type="button" className="p-3 border border-gray-200 rounded-full hover:bg-gray-50 transition">
+            <button
+              type="button"
+              className="p-3 border border-gray-200 rounded-full hover:bg-gray-50 transition"
+            >
               <FcGoogle className="text-xl" />
             </button>
-            <button type="button" className="p-3 border border-gray-200 rounded-full hover:bg-gray-50 transition">
+            <button
+              type="button"
+              className="p-3 border border-gray-200 rounded-full hover:bg-gray-50 transition"
+            >
               <FaApple className="text-xl text-gray-900" />
             </button>
-            <button type="button" className="p-3 border border-gray-200 rounded-full hover:bg-gray-50 transition">
+            <button
+              type="button"
+              className="p-3 border border-gray-200 rounded-full hover:bg-gray-50 transition"
+            >
               <FaFacebookF className="text-xl text-blue-600" />
             </button>
           </div>
 
           {/* Forgot / Register Links */}
           <div className="flex items-center justify-between text-xs mt-2">
-            <Link to="/forgetpass" className="text-gray-600 hover:text-indigo-600">
+            <Link
+              to="/forgetpass"
+              className="text-gray-600 hover:text-indigo-600"
+            >
               Forgot Password?
             </Link>
             <div className="text-gray-600">
               Don’t have an account?{" "}
-              <Link to="/logRegister" className="font-medium text-indigo-600 hover:underline">
+              <Link
+                to="/logRegister"
+                className="font-medium text-indigo-600 hover:underline"
+              >
                 Sign up
               </Link>
             </div>
@@ -141,16 +160,11 @@ export default function Login() {
         </form>
 
         {/* Footer */}
-        
       </div>
 
       {/* ========== Right: Illustration ========== */}
       <div className=" hidden md:flex items-center justify-center  bg-white">
-        <img
-          src="public/login.png"
-          alt="Login illustration"
-          
-        />
+        <img src="public/login.png" alt="Login illustration" />
       </div>
     </div>
   );
